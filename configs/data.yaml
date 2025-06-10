@@ -2,4 +2,4 @@ train: C:\Users\Yingbo.Jiao\Desktop\PoseVision\data\images\train
 val: C:\Users\Yingbo.Jiao\Desktop\PoseVision\data\images\val
 
 nc: 4
-names: ['player', 'referee', 'basketball','others']
+names: ['player', 'ball', 'referee','others']
