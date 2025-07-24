@@ -7,7 +7,8 @@ def main():
         epochs=100,
         imgsz=2560,
         batch=16,
-        device=0
+        device=0,
+        patient=10
     )
 
 if __name__ == " _main_":
