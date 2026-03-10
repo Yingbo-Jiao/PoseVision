@@ -110,9 +110,9 @@ def analyze_video(video_path, output_json_path,
 
 if __name__ == "__main__":
     analyze_video(
-        video_path=r'C:\Users\Yingbo.Jiao22\Desktop\PoseVision\input\sample1.mp4',
+        video_path=r"C:\Users\Yingbo.Jiao\Desktop\sample1.mp4",
         output_json_path=r'C:\Users\Yingbo.Jiao22\Desktop\PoseVision\outputanalysis_results.json',
-        yolo_weights=r'C:\Users\Yingbo.Jiao22\Desktop\PoseVision\yolo_detection\best.pt',
+        yolo_weights=r'C:\Users\Yingbo.Jiao\Desktop\PoseVision\yolo_detection\best.pt',
         pose_config=r'C:\Users\Yingbo.Jiao22\Desktop\PoseVision\configs\body_2d_keypoint\rtmpose\body8\rtmpose-s_8xb256-420e_body8-256x192.py',
         pose_checkpoint=r'C:\Users\Yingbo.Jiao22\Desktop\PoseVision\configs\rtmpose-s_simcc-aic-coco_pt-aic-coco_420e-256x192-fcb2599b_20230126.pth'
     )

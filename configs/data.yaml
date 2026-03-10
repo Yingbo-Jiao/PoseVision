@@ -1,5 +1,5 @@
-train: C:\Users\Yingbo.Jiao\Desktop\PoseVision\data\images\train
-val: C:\Users\Yingbo.Jiao\Desktop\PoseVision\data\images\val
+train: C:\Users\Yingbo.Jiao\Desktop\PoseVision\yolo_detection\data\train
+val: C:\Users\Yingbo.Jiao\Desktop\PoseVision\yolo_detection\data\val
 
 nc: 4
 names: ['player', 'ball', 'referee','others']
