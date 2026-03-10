@@ -37,7 +37,7 @@ The modular architecture ensures scalability and robustness in complex sports vi
 
 ### Architecture Diagram
 
-*(Insert system architecture diagram here)*
+![Pipeline](assets/pipeline.jpg)
 
 ---
 
