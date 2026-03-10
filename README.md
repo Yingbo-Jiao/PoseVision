@@ -47,15 +47,15 @@ Example outputs from the PoseVision system include:
 
 ### Player Detection & Tracking
 
-*(Insert tracking GIF here)*
+![tracking](assets/tracking.gif)
 
 ### Pose Estimation
 
-*(Insert pose estimation GIF here)*
+![pose](assets/pose.gif)
 
 ### 2D Tactical Projection
 
-*(Insert projection GIF here)*
+![projection](assets/projection.gif)
 
 The system outputs structured JSON data including:
 
