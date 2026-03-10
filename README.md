@@ -112,7 +112,7 @@ Annotations follow the COCO format and include:
 - players
 - referees
 - basketball
-
+- ball
 Data augmentation techniques include:
 
 - brightness adjustment
