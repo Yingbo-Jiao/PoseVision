@@ -136,8 +136,36 @@ The system shows stable detection, identity tracking, and pose estimation on rea
 
 ---
 
+
 ## Repository Structure
 
+```
+PoseVision
+│
+├── assets
+│   ├── pipeline.png            # system architecture diagram
+│   ├── tracking.gif            # demo: player tracking
+│   ├── pose.gif                # demo: pose estimation
+│   └── projection.gif          # demo: 2D court projection
+│
+├── yolo_detection              # YOLOv11 detection module
+├── tracking                    # DeepSORT multi-object tracking
+├── pose                        # RTMPose inference module
+├── classify                    # team classification module
+├── court                       # 2D court projection and mapping
+│
+├── configs                     # model configuration files
+├── utils                       # helper functions and utilities
+├── weights                     # pretrained model weights
+│
+├── input                       # input videos / frames
+├── output                      # processed outputs
+├── results                     # experiment results and visualization
+│
+├── main.py                     # main pipeline entry
+├── requirements.txt            # dependencies
+└── README.md
+```
 ---
 
 ## Installation
