@@ -97,6 +97,7 @@ The system outputs structured JSON data including:
 ---
 
 ## Dataset
+https://huggingface.co/datasets/YingboJiao22/PoseVision
 
 The dataset was constructed from real professional basketball game videos.
 
