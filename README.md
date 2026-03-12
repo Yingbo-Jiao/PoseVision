@@ -23,12 +23,23 @@ PoseVision addresses these challenges by building a modular deep learning pipeli
 4. RTMPose predicts body keypoints for tracked players.
 5. The system exports frame-by-frame results to JSON for later visualization and analysis.
 
+## Architecture Diagram
+
+![Pipeline](assets/pipeline.jpg)
+
 ## Demo Assets
 
-- Tracking demo: `assets/tracking.gif`
-- Pose demo: `assets/pose.gif`
-- Projection demo: `assets/projection.gif`
-- Pipeline diagram: `assets/pipeline.jpg`
+### Player Detection and Tracking
+
+![Tracking Demo](assets/tracking.gif)
+
+### Pose Estimation
+
+![Pose Demo](assets/pose.gif)
+
+### 2D Tactical Projection
+
+![Projection Demo](assets/projection.gif)
 
 ## Dataset
 
