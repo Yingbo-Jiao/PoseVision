@@ -2,6 +2,19 @@
 
 PoseVision is an end-to-end basketball video understanding pipeline that combines player detection, multi-object tracking, team classification, pose estimation, and structured JSON export.
 
+This project was initially developed as an independent undergraduate research project and later expanded into a SURF research project.
+
+## Project Overview
+
+Modern sports analytics increasingly relies on automated video understanding. Basketball video analysis remains challenging because of:
+
+- rapid player movement
+- frequent occlusions
+- multiple interacting objects
+- complex tactical structures
+
+PoseVision addresses these challenges by building a modular deep learning pipeline that extracts player trajectories, team labels, poses, and frame-level structured outputs from broadcast basketball footage.
+
 ## Current Pipeline
 
 1. YOLO detects players and the ball.
@@ -9,6 +22,38 @@ PoseVision is an end-to-end basketball video understanding pipeline that combine
 3. A jersey-color clustering module assigns each player to one of two teams.
 4. RTMPose predicts body keypoints for tracked players.
 5. The system exports frame-by-frame results to JSON for later visualization and analysis.
+
+## Demo Assets
+
+- Tracking demo: `assets/tracking.gif`
+- Pose demo: `assets/pose.gif`
+- Projection demo: `assets/projection.gif`
+- Pipeline diagram: `assets/pipeline.jpg`
+
+## Dataset
+
+Dataset page:
+- [PoseVision dataset](https://huggingface.co/datasets/YingboJiao22/PoseVision)
+
+Current dataset summary:
+- Resolution: 3840x2160
+- Frame rate: 50 FPS
+- Total frames: about 30,000
+- Annotated frames: 2,000
+- Annotation categories: players, referees, basketball, ball
+
+## Experimental Results
+
+Current reported results:
+
+| Module | Metric | Result |
+|------|------|------|
+| Detection | mAP | 96.1% |
+| Tracking | MOTA | 82.1% |
+| Team classification | Accuracy | about 95% |
+| Pose estimation | PCK | above 83% |
+
+These numbers still need to be fully documented in the thesis with experiment settings and evaluation details.
 
 ## Repository Structure
 
@@ -29,6 +74,13 @@ PoseVision/
 ├── requirements.txt
 └── README.md
 ```
+
+## Important Files
+
+- `main.py`: main command-line entry for the full pipeline
+- `classify/team_classifier.py`: reusable team classification module used by the pipeline
+- `classify/classify.py`: legacy experimental script kept only for reference
+- `input/README.md`: where to place your local test videos
 
 ## Environment
 
@@ -86,29 +138,22 @@ Draw team-color bounding boxes:
 python utils/vis_classify.py
 ```
 
-Draw pose results on a black tactical background:
+Draw pose results on a black background:
 
 ```bash
 python utils/vis_skeleton.py
 ```
 
-## Demo Assets
-
-- Tracking demo: `assets/tracking.gif`
-- Pose demo: `assets/pose.gif`
-- Projection demo: `assets/projection.gif`
-- Pipeline diagram: `assets/pipeline.jpg`
-
 ## Notes for Graduation Project Use
 
-This repository is being cleaned up for reproducibility. The main pipeline has been updated to use:
+The main pipeline has been cleaned up to use:
 
 - relative paths instead of machine-specific absolute paths
 - a command-line entry point
 - a reusable `TeamClassifier` interface
 - a consistent `classified_results.json` format for downstream visualization
 
-For the thesis, you should still add:
+Before final thesis submission, you should still add:
 
 - dataset preparation details
 - metric definitions and experiment settings

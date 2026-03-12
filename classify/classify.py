@@ -1,3 +1,6 @@
+# Legacy experimental team classification script.
+# The reusable project interface lives in classify/team_classifier.py.
+
 #!/usr/bin/env python
 # coding: utf-8
 import numpy as np
@@ -446,5 +449,7 @@ class TeamMainRunner:
         print("✅ 带标签视频已保存到", out_path)
         # ===== 你的 main(video_path) 内容结束 =====
 
-runner = TeamMainRunner()
-runner.run(video_path="demo.mp4")  # 参数名保持一致即可；内部逻辑照你原 main
+
+if __name__ == "__main__":
+    runner = TeamMainRunner()
+    runner.run(video_path="demo.mp4")
