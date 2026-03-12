@@ -1,5 +1,11 @@
--r requirements/build.txt
--r requirements/runtime.txt
--r requirements/tests.txt
--r requirements/optional.txt
-11
+﻿numpy
+opencv-python
+scikit-learn
+shapely
+tqdm
+ultralytics
+deep-sort-realtime
+torch
+torchvision
+mmpose
+tensorflow

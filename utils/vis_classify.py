@@ -1,19 +1,25 @@
-import cv2
+﻿import cv2
 import json
+from pathlib import Path
 from tqdm import tqdm
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_VIDEO = PROJECT_ROOT / "input" / "sample.mp4"
+DEFAULT_CLASSIFIED_JSON = PROJECT_ROOT / "output" / "classified_results.json"
+DEFAULT_OUTPUT_VIDEO = PROJECT_ROOT / "output" / "team_visualization.mp4"
+
 
 def visualize_teams(video_path, classified_json_path, output_video_path):
     """
-    在视频上绘制球队边界框：
-    - team 0: 蓝色
-    - team 1: 白色
+    Draw team-colored bounding boxes on a video.
+    - team 0: blue
+    - team 1: white
     """
 
-    # 读取分类结果
-    with open(classified_json_path, "r") as f:
+    with open(classified_json_path, "r", encoding="utf-8") as f:
         classified_data = json.load(f)
 
-    # 打开视频
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
         raise IOError(f"Cannot open video {video_path}")
@@ -23,11 +29,11 @@ def visualize_teams(video_path, classified_json_path, output_video_path):
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-    # 输出视频
+    output_path = Path(output_video_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-    out = cv2.VideoWriter(output_video_path, fourcc, fps, (width, height))
+    out = cv2.VideoWriter(str(output_path), fourcc, fps, (width, height))
 
-    # 转换成 {frame_num: players_list} 方便查找
     frame_dict = {item["frame"]: item["players"] for item in classified_data}
 
     for frame_idx in tqdm(range(frame_count), desc="Drawing Teams"):
@@ -35,26 +41,25 @@ def visualize_teams(video_path, classified_json_path, output_video_path):
         if not ret:
             break
 
-        frame_num = frame_idx + 1  # JSON 的帧号是从 1 开始的
+        frame_num = frame_idx + 1
         players = frame_dict.get(frame_num, [])
 
         for player in players:
             x1, y1, x2, y2 = map(int, player["bbox"])
-            team = player["team"]
-
-            color = (255, 0, 0) if team == 0 else (255, 255, 255)  # 蓝 or 白
+            team = player.get("team", -1)
+            color = (255, 0, 0) if team == 0 else (255, 255, 255)
             cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
 
         out.write(frame)
 
     cap.release()
     out.release()
-    print(f"队伍边界框视频已保存到 {output_video_path}")
+    print(f"Team visualization saved to {output_path}")
 
 
 if __name__ == "__main__":
-    video_path = r"C:\Users\Yingbo.Jiao\Desktop\sample1.mp4"
-    classified_json_path = r"C:\Users\Yingbo.Jiao\Desktop\classified_results(1).json"
-    output_video_path = r"C:\Users\Yingbo.Jiao\Desktop\PoseVision\output\team_visualization.mp4"
-
-    visualize_teams(video_path, classified_json_path, output_video_path)
+    visualize_teams(
+        video_path=str(DEFAULT_VIDEO),
+        classified_json_path=str(DEFAULT_CLASSIFIED_JSON),
+        output_video_path=str(DEFAULT_OUTPUT_VIDEO),
+    )

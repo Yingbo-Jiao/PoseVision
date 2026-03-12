@@ -1,178 +1,116 @@
-PoseVision is an end-to-end deep learning pipeline for basketball video understanding integrating YOLOv11, DeepSORT, and RTMPose.
-# PoseVision: AI-Powered Basketball Video Analytics
+﻿# PoseVision: Basketball Video Analytics
 
-PoseVision is an end-to-end computer vision pipeline designed for automated basketball video analysis.  
-The system integrates object detection, multi-object tracking, team classification, and human pose estimation to extract structured information from raw basketball game footage.
+PoseVision is an end-to-end basketball video understanding pipeline that combines player detection, multi-object tracking, team classification, pose estimation, and structured JSON export.
 
-This project was initially developed as an **independent undergraduate research project** and later expanded into a **SURF research project**.
+## Current Pipeline
 
----
-
-## Project Overview
-
-Modern sports analytics increasingly relies on automated video understanding.  
-However, basketball video analysis remains challenging due to:
-
-- rapid player movement
-- frequent occlusions
-- multiple interacting objects
-- complex tactical structures
-
-PoseVision addresses these challenges by building a **modular deep learning pipeline** capable of extracting player trajectories, poses, and spatial formations from broadcast basketball footage.
-
-The system generates structured outputs that can support:
-
-- tactical analysis
-- performance evaluation
-- intelligent broadcasting
-- sports data mining
-
----
-
-## System Architecture
-
-The PoseVision framework integrates several state-of-the-art computer vision modules into a unified pipeline.
-
-The modular architecture ensures scalability and robustness in complex sports video scenarios.
-
-### Architecture Diagram
-
-![Pipeline](assets/pipeline.jpg)
-
----
-
-## Demo
-
-Example outputs from the PoseVision system include:
-
-### Player Detection & Tracking
-
-![tracking](assets/tracking.gif)
-
-### Pose Estimation
-
-![pose](assets/pose.gif)
-
-### 2D Tactical Projection
-
-![projection](assets/projection.gif)
-
-The system outputs structured JSON data including:
-
-- bounding boxes
-- player identities
-- team labels
-- pose keypoints
-- projected court coordinates
-
----
-
-## Key Features
-
-### Player & Referee Detection
-
-- YOLOv11-based real-time detection
-- Detects players, referees, and the basketball
-
-### Multi-Object Tracking
-
-- DeepSORT maintains consistent identities across frames
-- Robust to occlusions and fast movement
-
-### Team Classification
-
-- K-Means clustering on HSV color histograms
-- Semi-automatic correction improves accuracy
-
-### Pose Estimation
-
-- RTMPose-S model for real-time human keypoint detection
-- Predicts 17 COCO-format body keypoints per player
-
-### Tactical Projection
-
-- Player coordinates projected to a 2D basketball court
-- Enables spatial and tactical analysis
-
----
-
-## Dataset
-
-The dataset was constructed from real professional basketball game videos.
-
-Dataset statistics:
-
-- Resolution: 3840×2160
-- Frame rate: 50 FPS
-- Total frames: ~30,000
-- Annotated frames: 2,000
-
-Annotations follow the COCO format and include:
-
-- players
-- referees
-- basketball
-- ball
-Data augmentation techniques include:
-
-- brightness adjustment
-- contrast enhancement
-- geometric transformations
-
----
-
-## Experimental Results
-
-Preliminary experiments demonstrate promising performance.
-
-| Module | Metric | Result |
-|------|------|------|
-Detection | mAP | 96.1% |
-Tracking | MOTA | 82.1% |
-Team classification | Accuracy | ~95% |
-Pose estimation | PCK | >83% |
-
-The system shows stable detection, identity tracking, and pose estimation on real basketball game videos.
-
----
-
+1. YOLO detects players and the ball.
+2. DeepSORT keeps player and ball identities stable across frames.
+3. A jersey-color clustering module assigns each player to one of two teams.
+4. RTMPose predicts body keypoints for tracked players.
+5. The system exports frame-by-frame results to JSON for later visualization and analysis.
 
 ## Repository Structure
 
-```
-PoseVision
-│
-├── assets
-│   ├── pipeline.png            # system architecture diagram
-│   ├── tracking.gif            # demo: player tracking
-│   ├── pose.gif                # demo: pose estimation
-│   └── projection.gif          # demo: 2D court projection
-│
-├── yolo_detection              # YOLOv11 detection module
-├── tracking                    # DeepSORT multi-object tracking
-├── pose                        # RTMPose inference module
-├── classify                    # team classification module
-├── court                       # 2D court projection and mapping
-│
-├── configs                     # model configuration files
-├── utils                       # helper functions and utilities
-├── weights                     # pretrained model weights
-│
-├── input                       # input videos / frames
-├── output                      # processed outputs
-├── results                     # experiment results and visualization
-│
-├── main.py                     # main pipeline entry
-├── requirements.txt            # dependencies
+```text
+PoseVision/
+├── assets/
+├── classify/
+├── configs/
+├── court/
+├── input/
+├── output/
+├── pose/
+├── tracking/
+├── utils/
+├── weights/
+├── yolo_detection/
+├── main.py
+├── requirements.txt
 └── README.md
 ```
----
+
+## Environment
+
+- Python 3.10 or newer is recommended.
+- A CUDA-capable GPU is recommended for RTMPose inference.
+- If you do not have a GPU, set `--device cpu` when running the pipeline.
 
 ## Installation
 
-Clone the repository and install dependencies.
+```bash
+pip install -r requirements.txt
+```
+
+## Required Files
+
+Before running the project, make sure these files exist:
+
+- YOLO weights: `yolo_detection/best.pt`
+- RTMPose config: `configs/body_2d_keypoint/rtmpose/body8/rtmpose-s_8xb256-420e_body8-256x192.py`
+- RTMPose checkpoint: `configs/rtmpose-s_simcc-aic-coco_pt-aic-coco_420e-256x192-fcb2599b_20230126.pth`
+- Input video: place one test video in `input/`, for example `input/sample.mp4`
+
+## Quick Start
+
+Run the full pipeline:
 
 ```bash
-git clone https://github.com/Yingbo-Jiao/PoseVision
-cd PoseVision
-pip install -r requirements.txt
+python main.py --video input/sample.mp4
+```
+
+If you want CPU inference:
+
+```bash
+python main.py --video input/sample.mp4 --device cpu
+```
+
+If you want a custom output location:
+
+```bash
+python main.py --video input/sample.mp4 --output-json output/analysis_results.json
+```
+
+## Outputs
+
+After running the pipeline, the main outputs are written to `output/`:
+
+- `analysis_results.json`: tracked players, tracked balls, and pose results
+- `classified_results.json`: per-frame team assignments for player detections
+
+## Visualization Scripts
+
+Draw team-color bounding boxes:
+
+```bash
+python utils/vis_classify.py
+```
+
+Draw pose results on a black tactical background:
+
+```bash
+python utils/vis_skeleton.py
+```
+
+## Demo Assets
+
+- Tracking demo: `assets/tracking.gif`
+- Pose demo: `assets/pose.gif`
+- Projection demo: `assets/projection.gif`
+- Pipeline diagram: `assets/pipeline.jpg`
+
+## Notes for Graduation Project Use
+
+This repository is being cleaned up for reproducibility. The main pipeline has been updated to use:
+
+- relative paths instead of machine-specific absolute paths
+- a command-line entry point
+- a reusable `TeamClassifier` interface
+- a consistent `classified_results.json` format for downstream visualization
+
+For the thesis, you should still add:
+
+- dataset preparation details
+- metric definitions and experiment settings
+- ablation or comparison experiments
+- failure case analysis
