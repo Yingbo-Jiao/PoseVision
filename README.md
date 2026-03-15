@@ -70,20 +70,22 @@ These numbers still need to be fully documented in the thesis with experiment se
 
 ```text
 PoseVision/
-├── assets/
-├── classify/
-├── configs/
-├── court/
-├── input/
-├── output/
-├── pose/
-├── tracking/
-├── utils/
-├── weights/
-├── yolo_detection/
-├── main.py
-├── requirements.txt
-└── README.md
+|-- assets/           # pipeline image and demo GIFs
+|-- classify/         # team classification modules
+|-- configs/          # RTMPose configs and checkpoints references
+|-- court/            # manual court calibration and 2D projection
+|-- input/            # local input videos
+|-- output/           # JSON outputs generated after running the pipeline
+|-- pose/             # pose estimation code
+|-- results/          # saved visual results and experiments
+|-- tactical/         # tactical-ready export and future analysis modules
+|-- tracking/         # DeepSORT-based tracking
+|-- utils/            # visualization scripts
+|-- weights/          # optional local model weights
+|-- yolo_detection/   # YOLO detection code and weights
+|-- main.py           # main entry point
+|-- README.md
+`-- requirements.txt
 ```
 
 ## Important Files
@@ -91,6 +93,8 @@ PoseVision/
 - `main.py`: main command-line entry for the full pipeline
 - `classify/team_classifier.py`: reusable team classification module used by the pipeline
 - `classify/classify.py`: legacy experimental script kept only for reference
+- `court/court.py`: manual calibration, court ROI filtering, and homography-based 2D projection
+- `tactical/exporter.py`: tactical-ready export and unified `master_sequence.json` generation
 - `input/README.md`: where to place your local test videos
 
 ## Environment
