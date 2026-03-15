@@ -167,18 +167,18 @@ Draw pose results on a black background:
 python utils/vis_skeleton.py
 ```
 
-## Notes for Graduation Project Use
+## Current Limitations
 
-The main pipeline has been cleaned up to use:
+- Long-horizon player identity is still not stable enough for player-specific tactical analysis.
+- Team classification can fluctuate under severe occlusion, motion blur, or similar jersey colors.
+- Ball detection is incomplete in some frames and currently depends on interpolation and smoothing for tactical export.
+- Tactical event recognition is not yet included in the released pipeline.
 
-- relative paths instead of machine-specific absolute paths
-- a command-line entry point
-- a reusable `TeamClassifier` interface
-- a consistent `classified_results.json` format for downstream visualization
+## Future Work
 
-Before final thesis submission, you should still add:
-
-- dataset preparation details
-- metric definitions and experiment settings
-- ablation or comparison experiments
-- failure case analysis
+- Possession segmentation based on projected ball and team locations.
+- Transition vs. half-court phase recognition.
+- Offensive alignment recognition, such as `5-out`, `4-out-1-in`, and `3-out-2-in`.
+- Help-defense and paint-collapse analysis using projected team structure.
+- Stronger temporal consistency for team labels, tracking, and ball trajectory recovery.
+- Data-driven tactical pattern discovery from projected team formations and movement sequences.
