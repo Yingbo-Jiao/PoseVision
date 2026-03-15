@@ -122,6 +122,15 @@ Run the full pipeline:
 python main.py --video input/sample.mp4
 ```
 
+By default, every run opens a manual calibration flow. The program first asks you to choose half court or full court, then you click 4 points on the video frame and 4 matching points on the reference court canvas. This supports irregular quadrilaterals and different video types.
+
+
+If you want to reuse the last saved calibration instead of recalibrating:
+
+```bash
+python main.py --video input/sample.mp4 --reuse-court --court-mode half
+```
+
 If you want CPU inference:
 
 ```bash
@@ -138,8 +147,11 @@ python main.py --video input/sample.mp4 --output-json output/analysis_results.js
 
 After running the pipeline, the main outputs are written to `output/`:
 
+- `master_sequence.json`: unified main output that combines analysis, classification, projection, and tactical-ready summaries per frame
 - `analysis_results.json`: tracked players, tracked balls, and pose results
 - `classified_results.json`: per-frame team assignments for player detections
+- `transformed_positions_fixed.json`: raw 2D projected player and ball positions
+- `tactical_sequences.json`: tactical-ready data with team buckets, team summaries, and interpolated/smoothed ball trajectory
 
 ## Visualization Scripts
 

@@ -1,4 +1,6 @@
-﻿import argparse
+from __future__ import annotations
+
+import argparse
 import json
 from pathlib import Path
 
@@ -6,7 +8,9 @@ import cv2
 from tqdm import tqdm
 
 from classify.team_classifier import TeamClassifier
+from court.court import Court
 from pose.pose_estimator import PoseEstimator
+from tactical.exporter import TacticalDataExporter
 from tracking.track import DeepSortTracker
 from yolo_detection.detector import YOLODetector
 
@@ -29,16 +33,35 @@ def analyze_video(
     pose_config: str,
     pose_checkpoint: str,
     device: str = "cuda:0",
-) -> tuple[Path, Path]:
+    court_mode: str = "half",
+    reuse_court: bool = False,
+) -> tuple[Path, Path, Path | None, Path | None, Path | None]:
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
         raise ValueError(f"Unable to open video: {video_path}")
 
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    ok, _ = cap.read()
+    fps = float(cap.get(cv2.CAP_PROP_FPS) or 0.0)
+    ok, first_frame = cap.read()
     if not ok:
         cap.release()
         raise ValueError(f"Unable to read first frame from: {video_path}")
+
+    output_path = Path(output_json_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    classified_path = output_path.parent / "classified_results.json"
+    projected_path = output_path.parent / "transformed_positions_fixed.json"
+    tactical_path = output_path.parent / "tactical_sequences.json"
+    master_path = output_path.parent / "master_sequence.json"
+    calibration_path = output_path.parent / "court_calibration.json"
+    polygon_path = output_path.parent / "court_polygon.json"
+
+    court = Court(calibration_path=calibration_path, polygon_path=polygon_path)
+    if reuse_court and court.load_calibration():
+        pass
+    else:
+        selected_court_mode = court.choose_court_mode(default_mode=court_mode)
+        court.calibrate(first_frame, court_mode=selected_court_mode)
 
     detector = YOLODetector(model_path=yolo_weights)
     team_classifier = TeamClassifier(sample_video_path=video_path, detector=detector)
@@ -60,6 +83,7 @@ def analyze_video(
             break
 
         detections = detector.detect_image(frame)
+        detections = court.filter_detections_by_polygon(detections, frame.shape)
         player_dets = []
         ball_dets = []
         for det in detections:
@@ -93,18 +117,19 @@ def analyze_video(
 
     cap.release()
 
-    output_path = Path(output_json_path)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    classified_path = output_path.parent / "classified_results.json"
-
     with output_path.open("w", encoding="utf-8") as f:
         json.dump(results, f, indent=2)
     with classified_path.open("w", encoding="utf-8") as f:
         json.dump(classified_frames, f, indent=2)
 
+    court.export_projected_results(results, projected_path)
+    exporter = TacticalDataExporter(court)
+    exporter.export(results, tactical_path, fps=fps)
+    exporter.export_master_sequence(results, classified_frames, master_path, fps=fps)
+
     print(f"[INFO] Main analysis results saved to: {output_path}")
     print(f"[INFO] Team classification results saved to: {classified_path}")
-    return output_path, classified_path
+    return output_path, classified_path, projected_path, tactical_path, master_path
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -135,6 +160,17 @@ def build_parser() -> argparse.ArgumentParser:
         default="cuda:0",
         help="Inference device, for example cuda:0 or cpu",
     )
+    parser.add_argument(
+        "--court-mode",
+        choices=["half", "full"],
+        default="half",
+        help="Reference court canvas for manual calibration.",
+    )
+    parser.add_argument(
+        "--reuse-court",
+        action="store_true",
+        help="Reuse the last saved court calibration instead of recalibrating.",
+    )
     return parser
 
 
@@ -147,4 +183,6 @@ if __name__ == "__main__":
         pose_config=args.pose_config,
         pose_checkpoint=args.pose_checkpoint,
         device=args.device,
+        court_mode=args.court_mode,
+        reuse_court=args.reuse_court,
     )
