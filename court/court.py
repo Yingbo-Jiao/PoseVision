@@ -54,6 +54,22 @@ class Court:
         self.polygon: Polygon | None = None
         self.homography_matrix: np.ndarray | None = None
 
+    @staticmethod
+    def _order_points(points: list[tuple[int, int]] | list[list[float]]) -> list[tuple[int, int]]:
+        pts = np.asarray(points, dtype=np.float32)
+        if pts.shape != (4, 2):
+            raise ValueError(f"Expected 4 points for court calibration, got shape {pts.shape}")
+
+        sums = pts.sum(axis=1)
+        diffs = np.diff(pts, axis=1).reshape(-1)
+
+        ordered = np.zeros((4, 2), dtype=np.float32)
+        ordered[0] = pts[np.argmin(sums)]
+        ordered[2] = pts[np.argmax(sums)]
+        ordered[1] = pts[np.argmin(diffs)]
+        ordered[3] = pts[np.argmax(diffs)]
+        return [(int(round(x)), int(round(y))) for x, y in ordered]
+
     def load_calibration(self) -> bool:
         if not self.calibration_path.exists():
             return False
@@ -108,15 +124,20 @@ class Court:
         image_points = self._collect_points(
             frame.copy(),
             window_name="Video Calibration",
-            instruction="Video: click TL -> TR -> BR -> BL | R reset | Enter confirm",
+            instruction="Video: click 4 court corners | R reset | Enter confirm",
         )
+        image_points = self._order_points(image_points)
 
         reference_canvas = self._draw_reference_court(court_mode, court_width, court_height)
         reference_points = self._collect_points(
             reference_canvas,
             window_name="Court Reference Calibration",
-            instruction="Reference: click matching TL -> TR -> BR -> BL | R reset | Enter confirm",
+            instruction="Reference: click 4 matching corners | R reset | Enter confirm",
         )
+        reference_points = self._order_points(reference_points)
+
+        print(f"[INFO] Ordered video points: {image_points}")
+        print(f"[INFO] Ordered reference points: {reference_points}")
 
         self.calibration = CourtCalibration(
             roi_points=[[float(x), float(y)] for x, y in image_points],
